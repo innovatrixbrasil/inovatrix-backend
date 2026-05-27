@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id               String    @id @default(cuid())
+  name             String
+  email            String    @unique
+  password         String
+  companyName      String
+  phone            String?
+  metaAccessToken  String?
+  wabaId           String?
+  phoneNumberId    String?
+  isActive         Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  messages         Message[]
+
+  @@map("tenants")
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  tenantId    String
+  whatsappId  String   @unique
+  from        String
+  type        String
+  content     String
+  timestamp   DateTime
+  createdAt   DateTime @default(now())
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
